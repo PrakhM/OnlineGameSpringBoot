@@ -5,6 +5,7 @@ public class Player
     private String tag;
     private int x;
     private int y;
+    private String colour;
 
     public String getTag()
     {
@@ -14,6 +15,16 @@ public class Player
     public int[] getCoordinate()
     {
         return new int[] {x, y};
+    }
+
+    public String getColour()
+    {
+        return this.colour;
+    }
+
+    public void setColour(String colour)
+    {
+        this.colour = colour;
     }
 
     public void setTag(String tag)
