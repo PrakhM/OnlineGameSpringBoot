@@ -27,11 +27,17 @@ public class GameMap
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
     };
 
-    private boolean[][] occupied = new boolean[15][20];
+    private boolean[][] occupied = new boolean[height][width];
 
     public void addPlayer(Player player)
     {
-
+        int x = 1;
+        while (occupied[1][x] || !isWalkable(new int[]{x, 1}))
+        {
+            x++;
+        }
+        occupied[1][x] = true;
+        player.setCoordinates(new int[]{x, 1});
     }
 
     public void movePlayer(Player player, int[] coordinates)
@@ -39,9 +45,9 @@ public class GameMap
         if(isWalkable(coordinates) && !isOccupied(coordinates))
         {
             int[] curr = player.getCoordinate();
-            occupied[curr[0]][curr[1]] = false;
+            occupied[curr[1]][curr[0]] = false;
             player.setCoordinates(coordinates);
-            occupied[coordinates[0]][coordinates[1]] = true;
+            occupied[coordinates[1]][coordinates[0]] = true;
         }
     }
 
@@ -55,6 +61,6 @@ public class GameMap
 
     boolean isOccupied(int[] coordinates)
     {
-        return occupied[coordinates[0]][coordinates[1]];
+        return occupied[coordinates[1]][coordinates[0]];
     }
 }

@@ -17,6 +17,9 @@ public class Player
         return new int[] {x, y};
     }
 
+    public int getX() { return x; }
+    public int getY() { return y; }
+
     public String getColour()
     {
         return this.colour;

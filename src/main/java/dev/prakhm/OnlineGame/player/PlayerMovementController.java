@@ -50,9 +50,11 @@ public class PlayerMovementController
         Player player = players.get((String)headerAccessor.getSessionAttributes().get("Tag"));
         int[] coordinate = new int[2];
         int[] oc = player.getCoordinate();
+        coordinate[0] = oc[0];
+        coordinate[1] = oc[1];
         if(dir == 0)
         {
-            coordinate[1] = oc[1] + 1;
+            coordinate[1] = oc[1] - 1;
         }
         else if(dir == 1)
         {
@@ -60,7 +62,7 @@ public class PlayerMovementController
         }
         else if(dir == 2)
         {
-            coordinate[1] = oc[1] - 1;
+            coordinate[1] = oc[1] + 1;
         }
         else if(dir == 3)
         {
