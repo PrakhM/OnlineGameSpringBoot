@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PokéWorld Online</title>
+    <title>PixelRealm</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background: #1a1a2e;
+            background: #2c2c2c;
             color: #eee;
             font-family: 'Courier New', monospace;
             display: flex;
@@ -20,7 +20,7 @@
 
         h1 {
             font-size: 1.2rem;
-            color: #f39c12;
+            color: #d4af37;
             padding: 8px 0;
             letter-spacing: 2px;
             text-transform: uppercase;
@@ -34,7 +34,7 @@
         }
 
         #gameCanvas {
-            border: 3px solid #f39c12;
+            border: 3px solid #d4af37;
             image-rendering: pixelated;
             display: block;
         }
@@ -43,25 +43,25 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            width: 220px;
+            width: 240px;
         }
 
         #players-panel {
-            background: #16213e;
-            border: 2px solid #0f3460;
+            background: #3a3a3a;
+            border: 2px solid #d4af37;
             border-radius: 4px;
             padding: 8px;
         }
 
         #players-panel h3 {
-            font-size: 0.75rem;
-            color: #f39c12;
+            font-size: 0.9rem;
+            color: #d4af37;
             margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        #player-list { font-size: 0.8rem; line-height: 1.8; }
+        #player-list { font-size: 0.9rem; line-height: 1.8; }
 
         .player-entry::before {
             content: '▶ ';
@@ -69,8 +69,8 @@
         }
 
         #chat-panel {
-            background: #16213e;
-            border: 2px solid #0f3460;
+            background: #3a3a3a;
+            border: 2px solid #d4af37;
             border-radius: 4px;
             display: flex;
             flex-direction: column;
@@ -78,10 +78,10 @@
         }
 
         #chat-panel h3 {
-            font-size: 0.75rem;
-            color: #f39c12;
+            font-size: 0.9rem;
+            color: #d4af37;
             padding: 8px;
-            border-bottom: 1px solid #0f3460;
+            border-bottom: 1px solid #555;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -90,57 +90,57 @@
             flex: 1;
             overflow-y: auto;
             padding: 8px;
-            font-size: 0.75rem;
+            font-size: 0.9rem;
             line-height: 1.5;
             max-height: 260px;
             min-height: 260px;
+            background: #2f2f2f;
         }
 
         .msg-chat { color: #eee; }
-        .msg-chat .sender { font-weight: bold; }
-        .msg-join { color: #2ecc71; font-style: italic; }
-        .msg-leave { color: #e74c3c; font-style: italic; }
+        .msg-chat .sender { font-weight: bold; color: #d4af37; }
+        .msg-join { color: #7ed957; font-style: italic; }
+        .msg-leave { color: #ff6b6b; font-style: italic; }
 
         #chat-input-area {
             display: flex;
-            border-top: 1px solid #0f3460;
+            border-top: 1px solid #555;
         }
 
         #chat-input {
             flex: 1;
-            background: #1a1a2e;
-            border: none;
+            background: #2c2c2c;
+            border: 2px solid #d4af37;
             color: #eee;
             padding: 6px 8px;
             font-family: inherit;
-            font-size: 0.75rem;
+            font-size: 0.9rem;
             outline: none;
         }
 
         #chat-send {
-            background: #f39c12;
+            background: #d4af37;
             border: none;
-            color: #1a1a2e;
+            color: #2c2c2c;
             padding: 6px 10px;
             font-family: inherit;
-            font-size: 0.75rem;
+            font-size: 0.9rem;
             font-weight: bold;
             cursor: pointer;
         }
 
-        #chat-send:hover { background: #e67e22; }
+        #chat-send:hover { background: #b8962e; }
 
         #controls-hint {
             font-size: 0.65rem;
-            color: #666;
+            color: #888;
             text-align: center;
             padding-bottom: 4px;
         }
 
-        /* Login overlay */
         #login-overlay {
             position: fixed; inset: 0;
-            background: rgba(26,26,46,0.97);
+            background: rgba(44,44,44,0.97);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -150,7 +150,7 @@
         }
 
         #login-overlay h2 {
-            color: #f39c12;
+            color: #d4af37;
             font-size: 1.8rem;
             letter-spacing: 4px;
         }
@@ -158,8 +158,8 @@
         #login-overlay p { color: #aaa; font-size: 0.85rem; }
 
         #username-input {
-            background: #16213e;
-            border: 2px solid #f39c12;
+            background: #3a3a3a;
+            border: 2px solid #d4af37;
             color: #eee;
             padding: 10px 16px;
             font-family: inherit;
@@ -171,9 +171,9 @@
         }
 
         #join-btn {
-            background: #f39c12;
+            background: #d4af37;
             border: none;
-            color: #1a1a2e;
+            color: #2c2c2c;
             padding: 10px 32px;
             font-family: inherit;
             font-size: 1rem;
@@ -183,28 +183,28 @@
             letter-spacing: 1px;
         }
 
-        #join-btn:hover { background: #e67e22; }
+        #join-btn:hover { background: #b8962e; }
     </style>
 </head>
 <body>
 
 <div id="login-overlay">
-    <h2>🎮 POKÉWORLD</h2>
-    <p>Enter your trainer name to begin</p>
-    <input id="username-input" type="text" maxlength="12" placeholder="TrainerName" autofocus />
+    <h2>PIXELREALM</h2>
+    <p>What do you call yourself?</p>
+    <input id="username-input" type="text" maxlength="12" placeholder="Enter.." autofocus />
     <button id="join-btn">ENTER WORLD</button>
 </div>
 
-<h1>🌍 PokéWorld Online</h1>
+<h1>PIXELREALM</h1>
 <div id="game-area">
     <canvas id="gameCanvas"></canvas>
     <div id="sidebar">
         <div id="players-panel">
-            <h3>👥 Online Trainers</h3>
+            <h3>People of this world</h3>
             <div id="player-list"></div>
         </div>
         <div id="chat-panel">
-            <h3>💬 World Chat</h3>
+            <h3>Chat</h3>
             <div id="chat-messages"></div>
             <div id="chat-input-area">
                 <input id="chat-input" type="text" maxlength="80" placeholder="Say something..." />
@@ -217,6 +217,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="/js/archery.js"></script>
 <script src="/js/main.js"></script>
 </body>
 </html>

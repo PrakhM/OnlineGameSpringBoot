@@ -6,6 +6,9 @@ public class Player
     private int x;
     private int y;
     private String colour;
+    private int location;
+    private int mode;
+    private int activity;
 
     public String getTag()
     {
@@ -23,6 +26,36 @@ public class Player
     public String getColour()
     {
         return this.colour;
+    }
+
+    public int getLocation()
+    {
+        return this.location;
+    }
+
+    public int getMode()
+    {
+        return this.mode;
+    }
+
+    public int getActivity()
+    {
+        return this.activity;
+    }
+
+    public void setActivity(int activity)
+    {
+        this.activity = activity;
+    }
+
+    public void setMode(int mode)
+    {
+        this.mode = mode;
+    }
+
+    public void setLocation(int location)
+    {
+        this.location = location;
     }
 
     public void setColour(String colour)
