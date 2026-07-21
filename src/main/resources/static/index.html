@@ -63,6 +63,38 @@
 
         #player-list { font-size: 0.9rem; line-height: 1.8; }
 
+        #beasts-toggle {
+            background: #3a3a3a;
+            border: 2px solid #d4af37;
+            color: #d4af37;
+            padding: 8px;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        #beasts-panel {
+            background: #3a3a3a;
+            border: 2px solid #d4af37;
+            border-radius: 4px;
+            padding: 8px;
+        }
+
+        #beasts-panel[hidden] { display: none; }
+
+        .beast-entry {
+            margin-top: 7px;
+            font-size: 0.75rem;
+        }
+
+        .beast-hp {
+            height: 8px;
+            background: #222;
+            border: 1px solid #eee;
+            margin-top: 3px;
+        }
+
+        .beast-hp-fill { height: 100%; }
+
         .player-entry::before {
             content: '▶ ';
             font-size: 0.6rem;
@@ -170,6 +202,16 @@
             width: 260px;
         }
 
+        #beast-input {
+            background: #3a3a3a;
+            border: 2px solid #d4af37;
+            color: #eee;
+            padding: 10px 16px;
+            font-family: inherit;
+            font-size: 1rem;
+            width: 260px;
+        }
+
         #join-btn {
             background: #d4af37;
             border: none;
@@ -192,6 +234,11 @@
     <h2>PIXELREALM</h2>
     <p>What do you call yourself?</p>
     <input id="username-input" type="text" maxlength="12" placeholder="Enter.." autofocus />
+    <select id="beast-input">
+        <option value="FIRE">Fire beast</option>
+        <option value="WATER">Water beast</option>
+        <option value="EARTH">Earth beast</option>
+    </select>
     <button id="join-btn">ENTER WORLD</button>
 </div>
 
@@ -203,6 +250,11 @@
             <h3>People of this world</h3>
             <div id="player-list"></div>
         </div>
+        <button id="beasts-toggle">MY BEASTS</button>
+        <div id="beasts-panel" hidden>
+            <h3>My beasts</h3>
+            <div id="beast-list"></div>
+        </div>
         <div id="chat-panel">
             <h3>Chat</h3>
             <div id="chat-messages"></div>
@@ -213,11 +265,10 @@
         </div>
     </div>
 </div>
-<div id="controls-hint">Arrow keys or WASD to move</div>
+<div id="controls-hint">Arrow keys or WASD to move · 1, 2, 3 to attack · S to skip wild encounters</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-<script src="/js/archery.js"></script>
 <script src="/js/main.js"></script>
 </body>
 </html>

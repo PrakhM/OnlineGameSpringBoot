@@ -11,17 +11,22 @@ public class ChatController
 {
     @MessageMapping("/chat.send")
     @SendTo("/topic/chat")
-    public ChatMessage sendMessage(@Payload ChatMessage message)
+    public ChatMessage sendMessage(@Payload ChatMessage message, SimpMessageHeaderAccessor headerAccessor)
     {
-        return message;
+        if (message == null || headerAccessor.getSessionAttributes() == null) return null;
+        String sender = (String) headerAccessor.getSessionAttributes().get("Tag");
+        if (sender == null || message.getContent() == null || message.getContent().isBlank() || message.getContent().length() > 80) return null;
+        return new ChatMessage(sender, message.getContent(), "CHAT");
     }
 
     @MessageMapping("/chat.join")
     @SendTo("/topic/chat")
     public ChatMessage join(@Payload ChatMessage message, SimpMessageHeaderAccessor headerAccessor)
     {
-        headerAccessor.getSessionAttributes().put("username", message.getSender());
-        return new ChatMessage(message.getSender(), message.getSender() + " joined the world!", "JOIN");
+        if (headerAccessor.getSessionAttributes() == null) return null;
+        String sender = (String) headerAccessor.getSessionAttributes().get("Tag");
+        if (sender == null) return null;
+        return new ChatMessage(sender, sender + " joined the world!", "JOIN");
     }
 
 }

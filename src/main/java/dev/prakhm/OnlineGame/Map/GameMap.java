@@ -11,10 +11,10 @@ public class GameMap
 
     private final int[][] shire = {
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,0,0,0,0,0,1,0,0,0,0,100,100,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,1,1,0,0,0,0,1,1,0,0,0,1,0,0,0,0,1},
-            {1,0,0,1,1,0,0,0,0,1,1,110,110,0,1,0,0,0,0,1},
+            {1,0,0,1,1,0,0,0,0,1,1,120,120,0,1,0,0,0,0,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,1},
             {1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,2,2,0,1},
             {1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,2,2,0,1},
@@ -68,38 +68,64 @@ public class GameMap
         maps[1] = new Maps(bree, occupiedBree);
     }
 
-    public void addPlayer(Player player)
+    public synchronized boolean addPlayer(Player player)
     {
         int x = 1;
-        while (occupiedShire[1][x] || !isWalkable(new int[]{x, 1}, player.getLocation()))
+        while (x < width - 1 && (occupiedShire[1][x] || !isWalkable(new int[]{x, 1}, player.getLocation())))
         {
             x++;
         }
+        if (occupiedShire[1][x] || !isWalkable(new int[]{x, 1}, player.getLocation())) return false;
         occupiedShire[1][x] = true;
         player.setCoordinates(new int[]{x, 1});
+        return true;
     }
 
-    public void movePlayer(Player player, int[] coordinates)
+    public synchronized void removePlayer(Player player)
     {
-        if(isTeleport(coordinates, player.getLocation()))
+        int[] coordinates = player.getCoordinate();
+        int location = player.getLocation();
+        if (isInBounds(coordinates) && maps[location].occupied[coordinates[1]][coordinates[0]])
         {
-            int[] curr = player.getCoordinate();
-            maps[player.getLocation()].occupied[curr[1]][curr[0]] = false;
-            player.setCoordinates(getStart(player.getLocation(), coordinates[1], coordinates[0]));
-            player.setLocation(maps[player.getLocation()].map[coordinates[1]][coordinates[0]]/10 - 1);
+            maps[location].occupied[coordinates[1]][coordinates[0]] = false;
         }
-        else if(isWalkable(coordinates, player.getLocation()) && !isOccupied(coordinates, player.getLocation()))
+    }
+
+    public synchronized void movePlayer(Player player, int[] coordinates)
+    {
+        int location = player.getLocation();
+        if (!isInBounds(coordinates)) return;
+
+        if(isTeleport(coordinates, location))
+        {
+            int newLocation = maps[location].map[coordinates[1]][coordinates[0]] / 10 - 1;
+            int[] start = getStart(location, coordinates[1], coordinates[0]);
+            if (isOccupied(start, newLocation)) return;
+
+            int[] curr = player.getCoordinate();
+            maps[location].occupied[curr[1]][curr[0]] = false;
+            player.setCoordinates(start);
+            player.setLocation(newLocation);
+            maps[newLocation].occupied[start[1]][start[0]] = true;
+            player.setMode(0);
+            player.setActivity(0);
+        }
+        else if(isWalkable(coordinates, location) && !isOccupied(coordinates, location))
         {
             int[] curr = player.getCoordinate();
-            maps[player.getLocation()].occupied[curr[1]][curr[0]] = false;
+            maps[location].occupied[curr[1]][curr[0]] = false;
             player.setCoordinates(coordinates);
-            maps[player.getLocation()].occupied[coordinates[1]][coordinates[0]] = true;
+            maps[location].occupied[coordinates[1]][coordinates[0]] = true;
 
-            if(isInteractable(coordinates, player.getLocation()))
+            if(isInteractable(coordinates, location))
             {
                 player.setMode(1);
-                player.setActivity(maps[player.getLocation()].map[player.getY()][player.getX()]);
-            }else player.setMode(0);
+                player.setActivity(maps[location].map[player.getY()][player.getX()]);
+            }else
+            {
+                player.setMode(0);
+                player.setActivity(0);
+            }
         }
     }
 
@@ -107,17 +133,19 @@ public class GameMap
     {
         int x = coordinates[0];
         int y = coordinates[1];
-        if (x < 0 || x >= width || y < 0 || y >= height) return false;
+        if (!isInBounds(coordinates)) return false;
         return maps[location].map[y][x]%3 == 0 || maps[location].map[y][x] >= 100;
     }
 
     boolean isOccupied(int[] coordinates, int location)
     {
+        if (!isInBounds(coordinates)) return true;
         return maps[location].occupied[coordinates[1]][coordinates[0]];
     }
 
     boolean isTeleport(int[] coordinates, int location)
     {
+        if (!isInBounds(coordinates)) return false;
         if(maps[location].map[coordinates[1]][coordinates[0]] >= 10 &&
                 maps[location].map[coordinates[1]][coordinates[0]] < 100) return true;
         else return false;
@@ -158,5 +186,12 @@ public class GameMap
             return true;
         }
         return false;
+    }
+
+    boolean isInBounds(int[] coordinates)
+    {
+        int x = coordinates[0];
+        int y = coordinates[1];
+        return x >= 0 && x < width && y >= 0 && y < height;
     }
 }
