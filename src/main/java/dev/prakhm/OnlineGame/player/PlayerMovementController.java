@@ -1,6 +1,9 @@
 package dev.prakhm.OnlineGame.player;
 
-import dev.prakhm.OnlineGame.Map.GameMap;
+import dev.prakhm.OnlineGame.beast.Beast;
+import dev.prakhm.OnlineGame.world.GameMap;
+import dev.prakhm.OnlineGame.world.MapRegistry;
+import dev.prakhm.OnlineGame.world.TileType;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -21,16 +24,15 @@ public class PlayerMovementController
             "#e74c3c","#3498db","#2ecc71","#f39c12",
             "#9b59b6","#1abc9c","#e67e22","#e91e63"
     };
-    private final String[] beastTypes = {"FIRE", "WATER", "EARTH"};
     private int colourIndex = 0;
     private final Random random = new Random();
     private SimpMessagingTemplate messagingTemplate;
-    private GameMap gameMap;
+    private MapRegistry mapRegistry;
 
-    public PlayerMovementController(SimpMessagingTemplate messagingTemplate, GameMap gameMap)
+    public PlayerMovementController(SimpMessagingTemplate messagingTemplate, MapRegistry mapRegistry)
     {
         this.messagingTemplate = messagingTemplate;
-        this.gameMap = gameMap;
+        this.mapRegistry = mapRegistry;
     }
 
     @MessageMapping("/player.addPlayer")
@@ -40,11 +42,12 @@ public class PlayerMovementController
                 headerAccessor.getSessionAttributes() == null || headerAccessor.getSessionAttributes().containsKey("Tag") ||
                 players.containsKey(player.getTag()) || player.getBeasts() == null || player.getBeasts().size() != 1 ||
                 player.getBeasts().get(0) == null || !isBeastType(player.getBeasts().get(0).getType())) return;
-        player.setLocation(0);
+        GameMap spawnMap = mapRegistry.defaultMap();
+        player.setLocation(spawnMap.getMapId());
         player.setActiveBeastIndex(0);
         player.setColour(colours[colourIndex % colours.length]);
         player.setBattleStatus("Exploring");
-        if (!gameMap.addPlayer(player)) return;
+        if (!spawnMap.addPlayer(player)) return;
 
         colourIndex++;
         headerAccessor.getSessionAttributes().put("Tag", player.getTag());
@@ -64,16 +67,17 @@ public class PlayerMovementController
         else coordinate[0]++;
 
         int[] before = player.getCoordinate();
-        gameMap.movePlayer(player, coordinate);
+        GameMap map = mapRegistry.byId(player.getLocation());
+        if (map == null) return;
+        map.movePlayer(player, coordinate);
         boolean moved = before[0] != player.getX() || before[1] != player.getY();
         if (moved) restoreBeasts(player);
-        if (moved && player.hasUsableBeast() &&
-                player.getActivity() != 120 && random.nextInt(100) < 20)
+        if (moved && player.getActivity() != TileType.ARENA.code() && map.rollEncounter(player))
         {
-            player.setEncounterBeast(new Beast(beastTypes[random.nextInt(beastTypes.length)]));
+            player.setEncounterBeast(map.spawnBeast());
             player.setBattleStatus("A wild beast appeared");
         }
-        if (player.getActivity() == 120 && player.hasUsableBeast()) startArenaBattle(player);
+        if (player.getActivity() == TileType.ARENA.code() && player.hasUsableBeast()) startArenaBattle(player);
         broadcastPlayers();
     }
 
@@ -176,7 +180,8 @@ public class PlayerMovementController
         String tag = (String) attrs.get("Tag");
         Player player = tag == null ? null : players.remove(tag);
         if (player == null) return;
-        gameMap.removePlayer(player);
+        GameMap map = mapRegistry.byId(player.getLocation());
+        if (map != null) map.removePlayer(player);
         if (player.getOpponent() != null)
         {
             Player opponent = players.get(player.getOpponent());
@@ -193,8 +198,7 @@ public class PlayerMovementController
 
     private boolean isBeastType(String type)
     {
-        for (String beastType : beastTypes) if (beastType.equals(type)) return true;
-        return false;
+        return type != null && mapRegistry.defaultMap().getBeastProbabilities().containsKey(type);
     }
 
     private void restoreBeasts(Player player)
@@ -246,7 +250,7 @@ public class PlayerMovementController
         if (player.getOpponent() != null) return;
         for (Player opponent : players.values())
         {
-            if (!opponent.getTag().equals(player.getTag()) && opponent.getActivity() == 120 && opponent.getOpponent() == null &&
+            if (!opponent.getTag().equals(player.getTag()) && opponent.getActivity() == TileType.ARENA.code() && opponent.getOpponent() == null &&
                     opponent.getEncounterBeast() == null && opponent.hasUsableBeast())
             {
                 player.setOpponent(opponent.getTag());

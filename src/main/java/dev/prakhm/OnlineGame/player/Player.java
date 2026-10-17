@@ -1,5 +1,7 @@
 package dev.prakhm.OnlineGame.player;
 
+import dev.prakhm.OnlineGame.beast.Beast;
+
 import java.util.ArrayList;
 import java.util.List;
 

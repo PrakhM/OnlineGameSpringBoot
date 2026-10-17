@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: OnlineGame
+
+game:
+  maps:
+    shire:
+      encounter-rate: 20
+      level-range:
+        min: 1
+        max: 3
+      beast-probabilities:
+        FIRE: 1.0
+        WATER: 1.0
+        EARTH: 1.0
+    bree:
+      encounter-rate: 20
+      level-range:
+        min: 1
+        max: 3
+      beast-probabilities:
+        FIRE: 1.0
+        WATER: 1.0
+        EARTH: 1.0
