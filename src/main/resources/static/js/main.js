@@ -246,7 +246,13 @@ document.addEventListener('keydown', function (e) {
         return;
     }
 
-    if (me.encounterBeast && e.key.toLowerCase() === 's') {
+    if (
+        me.encounterBeast &&
+        (
+            ['w', 'a', 's', 'd'].includes(e.key.toLowerCase()) ||
+            e.key.startsWith('Arrow')
+        )
+    ) {
         stompClient.send('/app/player.skipEncounter', {});
         return;
     }

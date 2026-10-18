@@ -1,5 +1,14 @@
 package dev.prakhm.OnlineGame.player;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import dev.prakhm.OnlineGame.Battle.BattleState;
+import dev.prakhm.OnlineGame.Items.BattleItem;
+import dev.prakhm.OnlineGame.Items.Beast;
+import dev.prakhm.OnlineGame.Items.NonBattleItem;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,13 +21,9 @@ public class Player
     private int location;
     private int mode;
     private int activity;
-    private List<Beast> beasts = new ArrayList<>();
-    private int activeBeastIndex;
-    private Beast encounterBeast;
-    private String opponent;
-    private boolean turn;
-    private boolean choosingBeast;
-    private String battleStatus;
+    private List<NonBattleItem> nonBattleInventory = new ArrayList<>();
+    private List<BattleItem> battleInventory = new ArrayList<>();
+    private BattleState battle = new BattleState();
 
     public String getTag()
     {
@@ -53,50 +58,41 @@ public class Player
         return this.activity;
     }
 
-    public List<Beast> getBeasts()
+    @JsonProperty("beasts")
+    @JsonAlias("battleInventory")
+    public List<BattleItem> getBattleInventory()
     {
-        return beasts;
+        return battleInventory;
     }
 
-    public int getActiveBeastIndex()
+    public List<NonBattleItem> getNonBattleInventory()
     {
-        return activeBeastIndex;
+        return nonBattleInventory;
     }
 
+    @JsonUnwrapped
+    public BattleState getBattle()
+    {
+        return battle;
+    }
+
+    @JsonIgnore
     public Beast getActiveBeast()
     {
-        if (activeBeastIndex < 0 || activeBeastIndex >= beasts.size()) return null;
-        return beasts.get(activeBeastIndex);
+        return getUsableBeast(battle.getActiveBeastIndex());
     }
 
-    public Beast getEncounterBeast()
+    @JsonIgnore
+    public Beast getUsableBeast(int index)
     {
-        return encounterBeast;
+        if (index < 0 || index >= battleInventory.size()) return null;
+        return Beast.usable(battleInventory.get(index));
     }
 
-    public String getOpponent()
-    {
-        return opponent;
-    }
-
-    public boolean isTurn()
-    {
-        return turn;
-    }
-
-    public boolean isChoosingBeast()
-    {
-        return choosingBeast;
-    }
-
-    public String getBattleStatus()
-    {
-        return battleStatus;
-    }
-
+    @JsonIgnore
     public boolean hasUsableBeast()
     {
-        return beasts.stream().anyMatch(beast -> beast.getHp() > 0);
+        return battleInventory.stream().anyMatch(item -> Beast.usable(item) != null);
     }
 
     public void setActivity(int activity)
@@ -130,33 +126,20 @@ public class Player
         this.y = coordinate[1];
     }
 
-    public void setActiveBeastIndex(int activeBeastIndex)
+    @JsonProperty("beasts")
+    @JsonAlias("battleInventory")
+    public void setBattleInventory(List<BattleItem> battleInventory)
     {
-        this.activeBeastIndex = activeBeastIndex;
+        this.battleInventory = battleInventory == null ? new ArrayList<>() : battleInventory;
     }
 
-    public void setEncounterBeast(Beast encounterBeast)
+    public void setNonBattleInventory(List<NonBattleItem> nonBattleInventory)
     {
-        this.encounterBeast = encounterBeast;
+        this.nonBattleInventory = nonBattleInventory == null ? new ArrayList<>() : nonBattleInventory;
     }
 
-    public void setOpponent(String opponent)
+    public void setBattle(BattleState battle)
     {
-        this.opponent = opponent;
-    }
-
-    public void setTurn(boolean turn)
-    {
-        this.turn = turn;
-    }
-
-    public void setChoosingBeast(boolean choosingBeast)
-    {
-        this.choosingBeast = choosingBeast;
-    }
-
-    public void setBattleStatus(String battleStatus)
-    {
-        this.battleStatus = battleStatus;
+        this.battle = battle == null ? new BattleState() : battle;
     }
 }
